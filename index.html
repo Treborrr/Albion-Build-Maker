@@ -16,7 +16,8 @@
   --glass1: rgba(255,255,255,.06);
   --glass2: rgba(255,255,255,.03);
 
-  --bgPanel: rgba(12,12,16,.62);
+  --wall: radial-gradient(1000px 600px at 50% 20%, rgba(0,0,0,.2), rgba(0,0,0,.92));
+  --wall-img: none;
 }
 
 *{ box-sizing:border-box; }
@@ -32,23 +33,53 @@ body{
   position:fixed;
   inset:0;
   background:#07080c;
+  background-image: var(--wall-img);
+  background-size: cover;
+  background-position:center;
+  background-repeat:no-repeat;
 }
 .wallpaper::after{
   content:"";
   position:absolute;
   inset:0;
-  background:radial-gradient(1000px 600px at 50% 20%, rgba(0,0,0,.2), rgba(0,0,0,.9));
+  background: var(--wall);
+}
+
+/* Floating settings gear (discreta) */
+.fab{
+  position:fixed;
+  top:14px;
+  right:14px;
+  width:38px;
+  height:38px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.10);
+  background:rgba(255,255,255,.06);
+  color:rgba(255,255,255,.78);
+  display:grid;
+  place-items:center;
+  cursor:pointer;
+  user-select:none;
+  z-index:40;
+  opacity:.55;
+  transition:opacity .12s ease, background .12s ease, border-color .12s ease, transform .12s ease;
+}
+.fab:hover{
+  opacity:.92;
+  background:rgba(255,255,255,.10);
+  border-color:rgba(255,255,255,.18);
+  transform: translateY(-1px);
 }
 
 .app{
   position:relative;
-  padding:22px 14px 96px;
+  padding:24px 14px 48px;
   display:flex;
   justify-content:center;
 }
 
 .canvas{
-  width:min(640px, 96vw);
+  width:min(680px, 96vw);
   border:1px solid var(--stroke);
   border-radius:22px;
   background:linear-gradient(180deg,var(--glass1),var(--glass2));
@@ -64,13 +95,14 @@ body{
   align-items:center;
   justify-content:space-between;
   margin-bottom:14px;
+  gap:10px;
 }
 
 .title{
-  font-weight:800;
+  font-weight:900;
   letter-spacing:.3px;
+  font-size:16px;
 }
-
 .credit{
   display:flex;
   gap:10px;
@@ -84,6 +116,11 @@ body{
   display:grid;place-items:center;
   font-weight:900;
 }
+.title.hidden, .credit.hidden{ display:none; }
+
+/* Spacing blocks (saltos “visuales”) */
+.blockGap{ height:12px; }
+.blockGapLg{ height:16px; }
 
 .grid3{
   display:grid;
@@ -100,18 +137,12 @@ body{
   position:relative;
   cursor:pointer;
   transition:.12s;
+  user-select:none;
 }
-.cell:hover{
-  border-color:var(--stroke2);
-}
-.cell.disabled{
-  cursor:not-allowed;
-}
-.cell img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
+.cell:hover{ border-color:var(--stroke2); }
+.cell.disabled{ cursor:not-allowed; }
+.cell img{ width:100%; height:100%; object-fit:cover; }
+
 .ph{
   position:absolute;
   inset:0;
@@ -121,109 +152,61 @@ body{
   font-weight:900;
   opacity:.25;
 }
-.itemLabel{
-  position:absolute;
-  left:10px;
-  right:10px;
-  bottom:10px;
-  padding:7px 10px;
-  border-radius:12px;
-  background:rgba(0,0,0,.55);
-  border:1px solid rgba(255,255,255,.1);
-  font-size:12px;
-  font-weight:700;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-
-.ghost{
-  opacity:.9;
-  filter:grayscale(.15);
-}
+.ghost{ opacity:.9; filter:grayscale(.15); }
 
 /* swaps */
-.swapHeader{
-  margin-top:16px;
+.swapWrap{
+  margin-top:14px;
   display:flex;
-  justify-content:flex-end;
+  flex-direction:column;
+  gap:12px;
 }
 .swapBlock{
-  margin-top:12px;
   border:1px solid var(--stroke);
   border-radius:18px;
   background:rgba(0,0,0,.25);
   padding:12px;
 }
-.swapTop{
-  display:flex;
-  gap:10px;
-  margin-bottom:10px;
+.swapTitleText{
+  font-weight:900;
+  letter-spacing:.2px;
+  opacity:.88;
+  margin:2px 2px 12px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
-.swapTop input{
-  flex:1;
-  padding:10px;
-  border-radius:12px;
-  border:1px solid var(--stroke);
-  background:rgba(0,0,0,.35);
-  color:var(--text);
-}
+.swapTitleText.empty{ display:none; }
+
 .swapGrid{
   display:grid;
   grid-template-columns:repeat(6,1fr);
   gap:10px;
 }
+@media(max-width:640px){
+  .swapGrid{ grid-template-columns:repeat(4,1fr); }
+}
 @media(max-width:520px){
   .swapGrid{ grid-template-columns:repeat(3,1fr); }
 }
 
-.btn{
-  border:1px solid var(--stroke);
-  background:rgba(255,255,255,.1);
-  color:var(--text);
-  padding:8px 12px;
-  border-radius:12px;
-  font-weight:700;
-  cursor:pointer;
-}
-.btn.icon{
-  width:40px;
-  padding:8px 0;
-  display:grid;
-  place-items:center;
-}
-
-.bottom{
-  position:fixed;
-  left:0;right:0;bottom:0;
-  padding:14px;
-  display:flex;
-  justify-content:center;
-  background:linear-gradient(180deg,transparent,rgba(0,0,0,.85));
-}
-.bar{
-  width:min(640px,96vw);
-  display:flex;
-  gap:10px;
-}
-.bar .grow{ flex:1; }
-
-/* modal */
+/* Search modal */
 .modal{
   position:fixed;
   inset:0;
   display:none;
-  background:rgba(0,0,0,.85);
+  background:rgba(0,0,0,.86);
   justify-content:center;
   align-items:center;
   padding:14px;
+  z-index:20;
 }
 .modal.open{ display:flex; }
 .card{
-  width:min(640px,96vw);
+  width:min(680px,96vw);
   border:1px solid var(--stroke);
   border-radius:20px;
-  background:rgba(15,15,20,.9);
+  background:rgba(15,15,20,.92);
   padding:14px;
 }
 .searchBox{
@@ -239,8 +222,18 @@ body{
   background:rgba(0,0,0,.35);
   color:var(--text);
 }
+.btn{
+  border:1px solid var(--stroke);
+  background:rgba(255,255,255,.10);
+  color:var(--text);
+  padding:10px 12px;
+  border-radius:12px;
+  font-weight:800;
+  cursor:pointer;
+}
+.btn:hover{ background:rgba(255,255,255,.14); }
 .results{
-  max-height:45vh;
+  max-height:50vh;
   overflow:auto;
   border:1px solid var(--stroke);
   border-radius:14px;
@@ -253,68 +246,189 @@ body{
   cursor:pointer;
   border-bottom:1px solid rgba(255,255,255,.05);
 }
-.result:hover{
-  background:rgba(255,255,255,.05);
+.result:hover{ background:rgba(255,255,255,.05); }
+.result img{ width:44px; height:44px; border-radius:10px; }
+.rMain{ flex:1; overflow:hidden; }
+.rMain .nm{ font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.rMain .sub{ font-size:12px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+/* Settings overlay */
+.overlay{
+  position:fixed;
+  inset:0;
+  display:none;
+  background:rgba(0,0,0,.80);
+  padding:14px;
+  z-index:30;
+  align-items:flex-end;
+  justify-content:center;
 }
-.result img{
-  width:44px;
-  height:44px;
-  border-radius:10px;
+.overlay.open{ display:flex; }
+.sheet{
+  width:min(760px,96vw);
+  border:1px solid var(--stroke);
+  border-radius:20px;
+  background:rgba(15,15,20,.92);
+  backdrop-filter:blur(14px);
+  padding:14px;
+  box-shadow:0 30px 110px rgba(0,0,0,.70);
 }
-.rMain{
-  flex:1;
-  overflow:hidden;
+.sheet h3{
+  margin:0;
+  font-size:16px;
+  letter-spacing:.2px;
 }
-.rMain .nm{
-  font-weight:800;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-.rMain .sub{
-  font-size:12px;
-  color:var(--muted);
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-.actions{
+.sheetHeader{
   display:flex;
-  justify-content:flex-end;
+  align-items:center;
+  justify-content:space-between;
   gap:10px;
+  margin-bottom:10px;
+}
+
+.row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  padding:12px 0;
+  border-top:1px solid rgba(255,255,255,.08);
+}
+.row:first-of-type{ border-top:none; }
+.row .left .k{ font-weight:900; }
+.row .left .d{ color:var(--muted); font-size:12px; margin-top:3px; }
+
+.toggle{
+  width:46px;height:28px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.16);
+  background:rgba(255,255,255,.10);
+  position:relative;
+  cursor:pointer;
+  flex:0 0 auto;
+}
+.toggle::after{
+  content:"";
+  position:absolute;
+  top:3px; left:3px;
+  width:22px; height:22px;
+  border-radius:999px;
+  background:rgba(255,255,255,.78);
+  transition:left .15s ease;
+}
+.toggle.on{ background:rgba(255,255,255,.18); }
+.toggle.on::after{ left:21px; }
+
+.sepTitle{
+  margin:14px 0 8px;
+  color:rgba(255,255,255,.86);
+  font-weight:900;
+  letter-spacing:.2px;
+}
+
+.presetRow{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.preset{
+  width:68px;
+  height:44px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.14);
+  cursor:pointer;
+  opacity:.9;
+  transition: transform .12s ease, opacity .12s ease, border-color .12s ease;
+  background-size:cover;
+  background-position:center;
+}
+.preset:hover{
+  transform: translateY(-1px);
+  opacity:1;
+  border-color: rgba(255,255,255,.22);
+}
+
+.fieldRow{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+.fieldRow input{
+  flex:1;
+  min-width:220px;
+  padding:10px 10px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.14);
+  background:rgba(0,0,0,.35);
+  color:var(--text);
+}
+
+.swapCfg{
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:16px;
+  padding:12px;
+  background:rgba(0,0,0,.20);
   margin-top:10px;
+}
+.swapCfgTop{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:10px;
+}
+.swapCfgTop input{
+  flex:1;
+  min-width:220px;
+  padding:10px 10px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.14);
+  background:rgba(0,0,0,.35);
+  color:var(--text);
+}
+.swapCfgBtns{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+}
+
+/* Responsive top */
+@media(max-width:520px){
+  .canvas{ padding:16px; }
+  .topbar{ flex-direction:column; align-items:flex-start; gap:6px; }
+  .title{ font-size:15px; }
 }
 </style>
 </head>
 
 <body>
-<div class="wallpaper"></div>
+<div class="wallpaper" id="wallpaper"></div>
+
+<div class="fab" id="btnSettings" title="Configuración">⚙️</div>
 
 <main class="app">
 <section class="canvas" id="buildCanvas">
   <div class="topbar">
-    <div class="title">Albion Build Maker</div>
-    <div class="credit">
+    <div class="title" id="appTitle">Albion Build Maker</div>
+    <div class="credit" id="creditBox">
       <div class="badge">T</div>
       <small>treborrr</small>
     </div>
   </div>
 
+  <div class="blockGap"></div>
+
   <div class="grid3" id="mainGrid"></div>
 
-  <div class="swapHeader">
-    <button class="btn icon" id="btnAddSwap">＋</button>
-  </div>
-  <div id="swapBlocks"></div>
+  <div class="blockGapLg"></div>
+
+  <div class="swapWrap" id="swapBlocks"></div>
 </section>
 </main>
 
-<div class="bottom">
-  <div class="bar">
-    <button class="btn grow" id="btnShot">Generar foto</button>
-  </div>
-</div>
-
+<!-- Search modal -->
 <div class="modal" id="itemModal">
   <div class="card">
     <div class="searchBox">
@@ -325,21 +439,99 @@ body{
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<!-- Settings overlay -->
+<div class="overlay" id="settingsOverlay">
+  <div class="sheet">
+    <div class="sheetHeader">
+      <h3>Configuración</h3>
+      <button class="btn" id="btnCloseSettings">Cerrar</button>
+    </div>
+
+    <div class="row">
+      <div class="left">
+        <div class="k">Créditos</div>
+        <div class="d">Mostrar / ocultar tu marca</div>
+      </div>
+      <div class="toggle on" id="toggleCredits"></div>
+    </div>
+
+    <div class="row">
+      <div class="left">
+        <div class="k">Título</div>
+        <div class="d">Mostrar / ocultar “Albion Build Maker”</div>
+      </div>
+      <div class="toggle on" id="toggleTitle"></div>
+    </div>
+
+    <div class="sepTitle">Fondo</div>
+
+    <div class="row" style="border-top:none; padding-top:0;">
+      <div class="left">
+        <div class="k">Presets</div>
+        <div class="d">Fondos rápidos (se guardan)</div>
+      </div>
+      <div></div>
+    </div>
+
+    <div class="presetRow" id="presetRow"></div>
+
+    <div class="row">
+      <div class="left">
+        <div class="k">Imagen por URL</div>
+        <div class="d">Pega un link directo a .jpg/.png</div>
+      </div>
+      <div></div>
+    </div>
+
+    <div class="fieldRow">
+      <input id="bgUrl" placeholder="https://..." />
+      <button class="btn" id="btnApplyUrl">Aplicar</button>
+      <button class="btn" id="btnClearBg">Quitar imagen</button>
+    </div>
+
+    <div class="row">
+      <div class="left">
+        <div class="k">Subir imagen</div>
+        <div class="d">Desde tu dispositivo</div>
+      </div>
+      <div></div>
+    </div>
+
+    <div class="fieldRow">
+      <input type="file" id="bgFile" accept="image/*" />
+    </div>
+
+    <div class="sepTitle">Swaps</div>
+
+    <div class="fieldRow" style="justify-content:flex-end;">
+      <button class="btn" id="btnAddSwapBlock">+ Bloque</button>
+      <button class="btn" id="btnRemoveSwapBlock">- Bloque</button>
+    </div>
+
+    <div id="swapConfigList"></div>
+
+    <div class="row" style="margin-top:10px;">
+      <div class="left">
+        <div class="d">Los controles de swaps se manejan aquí para mantener la vista limpia.</div>
+      </div>
+      <div></div>
+    </div>
+  </div>
+</div>
 
 <script>
 /* ========= DEMO DATA ========= */
 const ITEM_INDEX=[
-{ id:"T6_2H_AXE", name_es:"Hacha de batalla experto", name_en:"Expert's Battleaxe", slot:"mainhand", hands:2 },
-{ id:"T6_MAIN_SWORD", name_es:"Espada experto", name_en:"Expert's Broadsword", slot:"mainhand", hands:1 },
-{ id:"T6_OFF_SHIELD", name_es:"Escudo experto", name_en:"Expert's Shield", slot:"offhand" },
-{ id:"T6_HEAD_PLATE_SET1", name_es:"Casco de soldado experto", name_en:"Expert's Soldier Helmet", slot:"head" },
-{ id:"T6_ARMOR_PLATE_SET1", name_es:"Armadura de soldado experto", name_en:"Expert's Soldier Armor", slot:"chest" },
-{ id:"T6_CAPE", name_es:"Capa de experto", name_en:"Expert's Cape", slot:"cape" },
-{ id:"T6_BAG", name_es:"Bolsa experto", name_en:"Expert's Bag", slot:"bag" },
-{ id:"T6_POTION_HEAL", name_es:"Poción de curación experto", name_en:"Expert's Healing Potion", slot:"potion" },
-{ id:"T6_FOOD_OMELETTE", name_es:"Omelette experto", name_en:"Expert's Omelette", slot:"food" },
-{ id:"T6_MOUNT_HORSE", name_es:"Caballo experto", name_en:"Expert's Riding Horse", slot:"mount" }
+  { id:"T6_2H_AXE", name_es:"Hacha de batalla experto", name_en:"Expert's Battleaxe", slot:"mainhand", hands:2 },
+  { id:"T6_MAIN_SWORD", name_es:"Espada experto", name_en:"Expert's Broadsword", slot:"mainhand", hands:1 },
+  { id:"T6_OFF_SHIELD", name_es:"Escudo experto", name_en:"Expert's Shield", slot:"offhand" },
+  { id:"T6_HEAD_PLATE_SET1", name_es:"Casco de soldado experto", name_en:"Expert's Soldier Helmet", slot:"head" },
+  { id:"T6_ARMOR_PLATE_SET1", name_es:"Armadura de soldado experto", name_en:"Expert's Soldier Armor", slot:"chest" },
+  { id:"T6_CAPE", name_es:"Capa de experto", name_en:"Expert's Cape", slot:"cape" },
+  { id:"T6_BAG", name_es:"Bolsa experto", name_en:"Expert's Bag", slot:"bag" },
+  { id:"T6_POTION_HEAL", name_es:"Poción de curación experto", name_en:"Expert's Healing Potion", slot:"potion" },
+  { id:"T6_FOOD_OMELETTE", name_es:"Omelette experto", name_en:"Expert's Omelette", slot:"food" },
+  { id:"T6_MOUNT_HORSE", name_es:"Caballo experto", name_en:"Expert's Riding Horse", slot:"mount" }
 ];
 
 /* ========= STATE ========= */
@@ -347,43 +539,135 @@ const MAIN_ORDER=["bag","head","cape","main","chest","off","potion","mount","foo
 let build={ bag:null, head:null, cape:null, main:null, chest:null, off:null, potion:null, mount:null, food:null };
 let swaps=[];
 
+let settings = { showCredits:true, showTitle:true };
+let bgState = { mode:"preset", wall:"radial", img:"" }; // persisted
+
+/* ========= DOM ========= */
+const wallpaper=document.getElementById("wallpaper");
+
 const mainGrid=document.getElementById("mainGrid");
 const swapBlocks=document.getElementById("swapBlocks");
+
 const modal=document.getElementById("itemModal");
 const searchInput=document.getElementById("searchInput");
 const results=document.getElementById("results");
+const btnCancel=document.getElementById("btnCancel");
+
+const appTitle=document.getElementById("appTitle");
+const creditBox=document.getElementById("creditBox");
+
+const settingsOverlay=document.getElementById("settingsOverlay");
+const btnSettings=document.getElementById("btnSettings");
+const btnCloseSettings=document.getElementById("btnCloseSettings");
+const toggleCredits=document.getElementById("toggleCredits");
+const toggleTitle=document.getElementById("toggleTitle");
+
+const swapConfigList=document.getElementById("swapConfigList");
+const btnAddSwapBlock=document.getElementById("btnAddSwapBlock");
+const btnRemoveSwapBlock=document.getElementById("btnRemoveSwapBlock");
+
+const presetRow=document.getElementById("presetRow");
+const bgUrl=document.getElementById("bgUrl");
+const btnApplyUrl=document.getElementById("btnApplyUrl");
+const btnClearBg=document.getElementById("btnClearBg");
+const bgFile=document.getElementById("bgFile");
+
 let context=null;
 
 /* ========= HELPERS ========= */
-const norm=s=>s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+const norm=s=>(s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
 const find=id=>ITEM_INDEX.find(i=>i.id===id);
-const img=id=>`https://render.albiononline.com/v1/item/${id}@0.png?size=217`;
+const img=id=>`https://render.albiononline.com/v1/item/${encodeURIComponent(id)}@0.png?size=217`;
+
+function save(){
+  localStorage.setItem("abm_settings", JSON.stringify(settings));
+  localStorage.setItem("abm_bg", JSON.stringify(bgState));
+  localStorage.setItem("abm_swaps", JSON.stringify(swaps));
+  localStorage.setItem("abm_build", JSON.stringify(build));
+}
+function load(){
+  try{
+    const s = localStorage.getItem("abm_settings");
+    if(s) settings = {...settings, ...JSON.parse(s)};
+    const b = localStorage.getItem("abm_bg");
+    if(b) bgState = {...bgState, ...JSON.parse(b)};
+    const sw = localStorage.getItem("abm_swaps");
+    if(sw) swaps = JSON.parse(sw) || [];
+    const bu = localStorage.getItem("abm_build");
+    if(bu) build = JSON.parse(bu) || build;
+  }catch(e){}
+}
+
+/* ========= SETTINGS APPLY ========= */
+function applySettings(){
+  creditBox.classList.toggle("hidden", !settings.showCredits);
+  appTitle.classList.toggle("hidden", !settings.showTitle);
+  toggleCredits.classList.toggle("on", settings.showCredits);
+  toggleTitle.classList.toggle("on", settings.showTitle);
+}
+
+/* ========= BACKGROUND PRESETS ========= */
+const PRESETS = [
+  { name:"Nocturno", wall:"radial-gradient(1000px 600px at 50% 20%, rgba(0,0,0,.2), rgba(0,0,0,.92))", thumb:"linear-gradient(135deg,#0a0c14,#04050a)" },
+  { name:"Azul Luxe", wall:"radial-gradient(900px 520px at 50% 18%, rgba(40,90,255,.12), rgba(0,0,0,.92))", thumb:"linear-gradient(135deg,#0b1b3a,#02050c)" },
+  { name:"Dorado", wall:"radial-gradient(900px 520px at 50% 18%, rgba(255,200,40,.10), rgba(0,0,0,.92))", thumb:"linear-gradient(135deg,#2a1f07,#05060a)" },
+  { name:"Violeta", wall:"radial-gradient(900px 520px at 50% 18%, rgba(190,70,255,.10), rgba(0,0,0,.92))", thumb:"linear-gradient(135deg,#210a2a,#05060a)" },
+  { name:"Verde", wall:"radial-gradient(900px 520px at 50% 18%, rgba(60,255,170,.08), rgba(0,0,0,.92))", thumb:"linear-gradient(135deg,#082218,#05060a)" },
+];
+
+function renderPresets(){
+  presetRow.innerHTML="";
+  PRESETS.forEach((p,idx)=>{
+    const d=document.createElement("div");
+    d.className="preset";
+    d.title=p.name;
+    d.style.backgroundImage = p.thumb;
+    d.onclick=()=>{
+      bgState.mode="preset";
+      bgState.wall=p.wall;
+      bgState.img="";
+      applyBackground();
+      save();
+    };
+    presetRow.appendChild(d);
+  });
+}
+
+function applyBackground(){
+  document.documentElement.style.setProperty("--wall", bgState.wall || PRESETS[0].wall);
+  if(bgState.img){
+    document.documentElement.style.setProperty("--wall-img", `url("${bgState.img}")`);
+  }else{
+    document.documentElement.style.setProperty("--wall-img", "none");
+  }
+}
 
 /* ========= MAIN GRID ========= */
 function renderMain(){
   mainGrid.innerHTML="";
-  const twoH=build.main && find(build.main)?.hands===2;
+  const mainIt = build.main ? find(build.main) : null;
+  const twoH = !!(mainIt && mainIt.hands===2);
 
   MAIN_ORDER.forEach(k=>{
     const c=document.createElement("div");
     c.className="cell";
 
-    if(k==="off" && twoH){
-      const it=find(build.main);
+    if(k==="off" && twoH && mainIt){
       const im=document.createElement("img");
-      im.src=img(it.id);
+      im.src=img(mainIt.id);
       im.className="ghost";
       c.appendChild(im);
       c.classList.add("disabled");
-    }else if(build[k]){
+      c.onclick=()=>{};
+      mainGrid.appendChild(c);
+      return;
+    }
+
+    if(build[k]){
       const it=find(build[k]);
       const im=document.createElement("img");
       im.src=img(it.id);
       c.appendChild(im);
-      const lb=document.createElement("div");
-      lb.className="itemLabel";
-      lb.textContent=it.name_es;
-      c.appendChild(lb);
     }else{
       const ph=document.createElement("div");
       ph.className="ph";
@@ -396,37 +680,30 @@ function renderMain(){
   });
 }
 
-/* ========= SWAPS ========= */
+/* ========= SWAPS (CLEAN VIEW) ========= */
 function renderSwaps(){
   swapBlocks.innerHTML="";
+
   swaps.forEach((b,bi)=>{
     const box=document.createElement("div");
     box.className="swapBlock";
 
-    const top=document.createElement("div");
-    top.className="swapTop";
-
-    const inp=document.createElement("input");
-    inp.placeholder="Título (opcional)";
-    inp.value=b.title;
-    inp.oninput=()=>b.title=inp.value;
-
-    const del=document.createElement("button");
-    del.className="btn";
-    del.textContent="Eliminar";
-    del.onclick=()=>{ swaps.splice(bi,1); renderSwaps(); };
-
-    top.append(inp,del);
+    const title=document.createElement("div");
+    title.className="swapTitleText";
+    title.dataset.swapTitleFor = String(bi);
+    title.textContent = (b.title || "").trim();
+    if (!title.textContent) title.classList.add("empty");
 
     const grid=document.createElement("div");
     grid.className="swapGrid";
 
-    b.items.forEach((it,ii)=>{
+    b.items.forEach((itId,ii)=>{
       const c=document.createElement("div");
       c.className="cell";
-      if(it){
+
+      if(itId){
         const im=document.createElement("img");
-        im.src=img(it);
+        im.src=img(itId);
         c.appendChild(im);
       }else{
         const ph=document.createElement("div");
@@ -434,21 +711,160 @@ function renderSwaps(){
         ph.textContent="+";
         c.appendChild(ph);
       }
+
       c.onclick=()=>openModal("swap",bi,ii);
       grid.appendChild(c);
     });
 
-    box.append(top,grid);
+    box.append(title,grid);
     swapBlocks.appendChild(box);
   });
 }
 
-document.getElementById("btnAddSwap").onclick=()=>{
-  swaps.push({ title:"", items:[null,null,null,null,null,null] });
-  renderSwaps();
+function updateSwapTitleOnScreen(bi){
+  const el = document.querySelector(`[data-swap-title-for="${bi}"]`);
+  if (!el) return;
+  const v = (swaps[bi]?.title || "").trim();
+  el.textContent = v;
+  if (!v) el.classList.add("empty");
+  else el.classList.remove("empty");
+}
+
+/* ========= SWAPS CONFIG (OVERLAY) ========= */
+function renderSwapConfig(){
+  swapConfigList.innerHTML = "";
+
+  if (swaps.length === 0){
+    const empty = document.createElement("div");
+    empty.style.color = "rgba(255,255,255,.70)";
+    empty.style.fontSize = "13px";
+    empty.style.marginTop = "8px";
+    empty.textContent = "No hay swaps. Agrega un bloque para empezar.";
+    swapConfigList.appendChild(empty);
+    return;
+  }
+
+  swaps.forEach((b,bi)=>{
+    const cfg = document.createElement("div");
+    cfg.className = "swapCfg";
+
+    const top = document.createElement("div");
+    top.className = "swapCfgTop";
+
+    const input = document.createElement("input");
+    input.placeholder = "Título (opcional)";
+    input.value = b.title || "";
+    input.addEventListener("input", () => {
+      swaps[bi].title = input.value;
+      updateSwapTitleOnScreen(bi);
+      save();
+    });
+
+    const del = document.createElement("button");
+    del.className = "btn";
+    del.textContent = "Eliminar bloque";
+    del.onclick = () => {
+      swaps.splice(bi,1);
+      renderAll();
+      renderSwapConfig();
+      save();
+    };
+
+    top.append(input, del);
+
+    const btns = document.createElement("div");
+    btns.className = "swapCfgBtns";
+
+    const addCell = document.createElement("button");
+    addCell.className = "btn";
+    addCell.textContent = "+ Celda";
+    addCell.onclick = () => {
+      swaps[bi].items.push(null);
+      renderSwaps();
+      renderSwapConfig();
+      save();
+    };
+
+    const remCell = document.createElement("button");
+    remCell.className = "btn";
+    remCell.textContent = "- Celda";
+    remCell.onclick = () => {
+      if (swaps[bi].items.length <= 1) return;
+      swaps[bi].items.pop();
+      renderSwaps();
+      renderSwapConfig();
+      save();
+    };
+
+    btns.append(addCell, remCell);
+    cfg.append(top, btns);
+    swapConfigList.appendChild(cfg);
+  });
+}
+
+/* ========= OVERLAY EVENTS ========= */
+btnSettings.onclick = () => {
+  settingsOverlay.classList.add("open");
+  renderSwapConfig();
+  bgUrl.value = "";
 };
 
-/* ========= MODAL ========= */
+btnCloseSettings.onclick = () => settingsOverlay.classList.remove("open");
+settingsOverlay.addEventListener("click", (e)=>{
+  if(e.target === settingsOverlay) settingsOverlay.classList.remove("open");
+});
+
+toggleCredits.onclick = () => { settings.showCredits = !settings.showCredits; applySettings(); save(); };
+toggleTitle.onclick   = () => { settings.showTitle = !settings.showTitle; applySettings(); save(); };
+
+/* fondo: URL */
+btnApplyUrl.onclick = () => {
+  const url = (bgUrl.value || "").trim();
+  if(!url) return;
+  bgState.mode="image";
+  bgState.img=url;
+  applyBackground();
+  save();
+  bgUrl.value="";
+};
+btnClearBg.onclick = () => {
+  bgState.img="";
+  bgState.mode="preset";
+  applyBackground();
+  save();
+};
+
+/* fondo: upload */
+bgFile.addEventListener("change",(e)=>{
+  const f = e.target.files?.[0];
+  if(!f) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    bgState.mode="image";
+    bgState.img = String(reader.result || "");
+    applyBackground();
+    save();
+    bgFile.value="";
+  };
+  reader.readAsDataURL(f);
+});
+
+/* swaps: add/remove block */
+btnAddSwapBlock.onclick = () => {
+  swaps.push({ title:"", items:[null] });
+  renderSwaps();
+  renderSwapConfig();
+  save();
+};
+btnRemoveSwapBlock.onclick = () => {
+  if (!swaps.length) return;
+  swaps.pop();
+  renderSwaps();
+  renderSwapConfig();
+  save();
+};
+
+/* ========= SEARCH MODAL ========= */
 function openModal(slot,bi,ii){
   context={ slot, bi, ii };
   searchInput.value="";
@@ -456,47 +872,63 @@ function openModal(slot,bi,ii){
   modal.classList.add("open");
   searchInput.focus();
 }
-document.getElementById("btnCancel").onclick=()=>modal.classList.remove("open");
-
-searchInput.oninput=updateResults;
+btnCancel.onclick = () => modal.classList.remove("open");
+modal.addEventListener("click",(e)=>{
+  if(e.target===modal) modal.classList.remove("open");
+});
+searchInput.oninput = updateResults;
 
 function updateResults(){
   results.innerHTML="";
-  ITEM_INDEX.filter(it=>{
-    if(context.slot==="swap") return true;
-    if(context.slot==="main") return it.slot==="mainhand";
-    return it.slot===context.slot;
-  }).filter(it=>{
-    const q=norm(searchInput.value);
-    return !q || norm(it.name_es).includes(q) || norm(it.name_en).includes(q);
-  }).forEach(it=>{
-    const r=document.createElement("div");
-    r.className="result";
-    r.innerHTML=`<img src="${img(it.id)}"><div class="rMain"><div class="nm">${it.name_es}</div><div class="sub">${it.name_en}</div></div>`;
-    r.onclick=()=>{
-      if(context.slot==="swap"){
-        swaps[context.bi].items[context.ii]=it.id;
-      }else{
-        build[context.slot]=it.id;
-        if(context.slot==="main" && it.hands===2) build.off=null;
-      }
-      modal.classList.remove("open");
-      renderMain(); renderSwaps();
-    };
-    results.appendChild(r);
-  });
+  const q=norm(searchInput.value);
+
+  ITEM_INDEX
+    .filter(it=>{
+      if(context.slot==="swap") return true;
+      if(context.slot==="main") return it.slot==="mainhand";
+      return it.slot===context.slot;
+    })
+    .filter(it=>{
+      return !q || norm(it.name_es).includes(q) || norm(it.name_en).includes(q);
+    })
+    .forEach(it=>{
+      const r=document.createElement("div");
+      r.className="result";
+      r.innerHTML=`
+        <img src="${img(it.id)}" alt="">
+        <div class="rMain">
+          <div class="nm">${it.name_es || it.name_en || it.id}</div>
+          <div class="sub">${it.name_en || it.name_es || it.id}</div>
+        </div>
+      `;
+      r.onclick=()=>{
+        if(context.slot==="swap"){
+          swaps[context.bi].items[context.ii]=it.id;
+          renderSwaps();
+        }else{
+          build[context.slot]=it.id;
+          if(context.slot==="main" && it.hands===2) build.off=null;
+          renderMain();
+        }
+        save();
+        modal.classList.remove("open");
+      };
+      results.appendChild(r);
+    });
 }
 
-/* ========= SCREENSHOT ========= */
-document.getElementById("btnShot").onclick=async()=>{
-  const canvas=await html2canvas(document.getElementById("buildCanvas"),{scale:2});
-  const a=document.createElement("a");
-  a.href=canvas.toDataURL("image/png");
-  a.download="albion-build.png";
-  a.click();
-};
+/* ========= RENDER ALL ========= */
+function renderAll(){
+  applySettings();
+  applyBackground();
+  renderMain();
+  renderSwaps();
+}
 
-renderMain(); renderSwaps();
+/* ========= INIT ========= */
+load();
+renderPresets();
+renderAll();
 </script>
 </body>
 </html>
