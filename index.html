@@ -1,0 +1,502 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Albion Build Maker</title>
+
+<style>
+:root{
+  --text: rgba(255,255,255,.92);
+  --muted: rgba(255,255,255,.70);
+
+  --stroke: rgba(255,255,255,.10);
+  --stroke2: rgba(255,255,255,.18);
+
+  --glass1: rgba(255,255,255,.06);
+  --glass2: rgba(255,255,255,.03);
+
+  --bgPanel: rgba(12,12,16,.62);
+}
+
+*{ box-sizing:border-box; }
+body{
+  margin:0;
+  min-height:100vh;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  color:var(--text);
+  background:#07080c;
+}
+
+.wallpaper{
+  position:fixed;
+  inset:0;
+  background:#07080c;
+}
+.wallpaper::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:radial-gradient(1000px 600px at 50% 20%, rgba(0,0,0,.2), rgba(0,0,0,.9));
+}
+
+.app{
+  position:relative;
+  padding:22px 14px 96px;
+  display:flex;
+  justify-content:center;
+}
+
+.canvas{
+  width:min(640px, 96vw);
+  border:1px solid var(--stroke);
+  border-radius:22px;
+  background:linear-gradient(180deg,var(--glass1),var(--glass2));
+  backdrop-filter:blur(16px);
+  box-shadow:
+    0 40px 120px rgba(0,0,0,.75),
+    inset 0 1px 0 rgba(255,255,255,.06);
+  padding:18px;
+}
+
+.topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:14px;
+}
+
+.title{
+  font-weight:800;
+  letter-spacing:.3px;
+}
+
+.credit{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  opacity:.85;
+}
+.badge{
+  width:28px;height:28px;
+  border-radius:10px;
+  border:1px solid var(--stroke);
+  display:grid;place-items:center;
+  font-weight:900;
+}
+
+.grid3{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+}
+
+.cell{
+  aspect-ratio:1/1;
+  border-radius:18px;
+  border:1px solid var(--stroke);
+  background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02));
+  overflow:hidden;
+  position:relative;
+  cursor:pointer;
+  transition:.12s;
+}
+.cell:hover{
+  border-color:var(--stroke2);
+}
+.cell.disabled{
+  cursor:not-allowed;
+}
+.cell img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+.ph{
+  position:absolute;
+  inset:0;
+  display:grid;
+  place-items:center;
+  font-size:26px;
+  font-weight:900;
+  opacity:.25;
+}
+.itemLabel{
+  position:absolute;
+  left:10px;
+  right:10px;
+  bottom:10px;
+  padding:7px 10px;
+  border-radius:12px;
+  background:rgba(0,0,0,.55);
+  border:1px solid rgba(255,255,255,.1);
+  font-size:12px;
+  font-weight:700;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.ghost{
+  opacity:.9;
+  filter:grayscale(.15);
+}
+
+/* swaps */
+.swapHeader{
+  margin-top:16px;
+  display:flex;
+  justify-content:flex-end;
+}
+.swapBlock{
+  margin-top:12px;
+  border:1px solid var(--stroke);
+  border-radius:18px;
+  background:rgba(0,0,0,.25);
+  padding:12px;
+}
+.swapTop{
+  display:flex;
+  gap:10px;
+  margin-bottom:10px;
+}
+.swapTop input{
+  flex:1;
+  padding:10px;
+  border-radius:12px;
+  border:1px solid var(--stroke);
+  background:rgba(0,0,0,.35);
+  color:var(--text);
+}
+.swapGrid{
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:10px;
+}
+@media(max-width:520px){
+  .swapGrid{ grid-template-columns:repeat(3,1fr); }
+}
+
+.btn{
+  border:1px solid var(--stroke);
+  background:rgba(255,255,255,.1);
+  color:var(--text);
+  padding:8px 12px;
+  border-radius:12px;
+  font-weight:700;
+  cursor:pointer;
+}
+.btn.icon{
+  width:40px;
+  padding:8px 0;
+  display:grid;
+  place-items:center;
+}
+
+.bottom{
+  position:fixed;
+  left:0;right:0;bottom:0;
+  padding:14px;
+  display:flex;
+  justify-content:center;
+  background:linear-gradient(180deg,transparent,rgba(0,0,0,.85));
+}
+.bar{
+  width:min(640px,96vw);
+  display:flex;
+  gap:10px;
+}
+.bar .grow{ flex:1; }
+
+/* modal */
+.modal{
+  position:fixed;
+  inset:0;
+  display:none;
+  background:rgba(0,0,0,.85);
+  justify-content:center;
+  align-items:center;
+  padding:14px;
+}
+.modal.open{ display:flex; }
+.card{
+  width:min(640px,96vw);
+  border:1px solid var(--stroke);
+  border-radius:20px;
+  background:rgba(15,15,20,.9);
+  padding:14px;
+}
+.searchBox{
+  display:flex;
+  gap:10px;
+  margin-bottom:10px;
+}
+.searchBox input{
+  flex:1;
+  padding:12px;
+  border-radius:14px;
+  border:1px solid var(--stroke);
+  background:rgba(0,0,0,.35);
+  color:var(--text);
+}
+.results{
+  max-height:45vh;
+  overflow:auto;
+  border:1px solid var(--stroke);
+  border-radius:14px;
+}
+.result{
+  display:flex;
+  gap:10px;
+  padding:10px;
+  align-items:center;
+  cursor:pointer;
+  border-bottom:1px solid rgba(255,255,255,.05);
+}
+.result:hover{
+  background:rgba(255,255,255,.05);
+}
+.result img{
+  width:44px;
+  height:44px;
+  border-radius:10px;
+}
+.rMain{
+  flex:1;
+  overflow:hidden;
+}
+.rMain .nm{
+  font-weight:800;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.rMain .sub{
+  font-size:12px;
+  color:var(--muted);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
+  margin-top:10px;
+}
+</style>
+</head>
+
+<body>
+<div class="wallpaper"></div>
+
+<main class="app">
+<section class="canvas" id="buildCanvas">
+  <div class="topbar">
+    <div class="title">Albion Build Maker</div>
+    <div class="credit">
+      <div class="badge">T</div>
+      <small>treborrr</small>
+    </div>
+  </div>
+
+  <div class="grid3" id="mainGrid"></div>
+
+  <div class="swapHeader">
+    <button class="btn icon" id="btnAddSwap">＋</button>
+  </div>
+  <div id="swapBlocks"></div>
+</section>
+</main>
+
+<div class="bottom">
+  <div class="bar">
+    <button class="btn grow" id="btnShot">Generar foto</button>
+  </div>
+</div>
+
+<div class="modal" id="itemModal">
+  <div class="card">
+    <div class="searchBox">
+      <input id="searchInput" placeholder="Buscar item (ES / EN)" />
+      <button class="btn" id="btnCancel">Cerrar</button>
+    </div>
+    <div class="results" id="results"></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+<script>
+/* ========= DEMO DATA ========= */
+const ITEM_INDEX=[
+{ id:"T6_2H_AXE", name_es:"Hacha de batalla experto", name_en:"Expert's Battleaxe", slot:"mainhand", hands:2 },
+{ id:"T6_MAIN_SWORD", name_es:"Espada experto", name_en:"Expert's Broadsword", slot:"mainhand", hands:1 },
+{ id:"T6_OFF_SHIELD", name_es:"Escudo experto", name_en:"Expert's Shield", slot:"offhand" },
+{ id:"T6_HEAD_PLATE_SET1", name_es:"Casco de soldado experto", name_en:"Expert's Soldier Helmet", slot:"head" },
+{ id:"T6_ARMOR_PLATE_SET1", name_es:"Armadura de soldado experto", name_en:"Expert's Soldier Armor", slot:"chest" },
+{ id:"T6_CAPE", name_es:"Capa de experto", name_en:"Expert's Cape", slot:"cape" },
+{ id:"T6_BAG", name_es:"Bolsa experto", name_en:"Expert's Bag", slot:"bag" },
+{ id:"T6_POTION_HEAL", name_es:"Poción de curación experto", name_en:"Expert's Healing Potion", slot:"potion" },
+{ id:"T6_FOOD_OMELETTE", name_es:"Omelette experto", name_en:"Expert's Omelette", slot:"food" },
+{ id:"T6_MOUNT_HORSE", name_es:"Caballo experto", name_en:"Expert's Riding Horse", slot:"mount" }
+];
+
+/* ========= STATE ========= */
+const MAIN_ORDER=["bag","head","cape","main","chest","off","potion","mount","food"];
+let build={ bag:null, head:null, cape:null, main:null, chest:null, off:null, potion:null, mount:null, food:null };
+let swaps=[];
+
+const mainGrid=document.getElementById("mainGrid");
+const swapBlocks=document.getElementById("swapBlocks");
+const modal=document.getElementById("itemModal");
+const searchInput=document.getElementById("searchInput");
+const results=document.getElementById("results");
+let context=null;
+
+/* ========= HELPERS ========= */
+const norm=s=>s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+const find=id=>ITEM_INDEX.find(i=>i.id===id);
+const img=id=>`https://render.albiononline.com/v1/item/${id}@0.png?size=217`;
+
+/* ========= MAIN GRID ========= */
+function renderMain(){
+  mainGrid.innerHTML="";
+  const twoH=build.main && find(build.main)?.hands===2;
+
+  MAIN_ORDER.forEach(k=>{
+    const c=document.createElement("div");
+    c.className="cell";
+
+    if(k==="off" && twoH){
+      const it=find(build.main);
+      const im=document.createElement("img");
+      im.src=img(it.id);
+      im.className="ghost";
+      c.appendChild(im);
+      c.classList.add("disabled");
+    }else if(build[k]){
+      const it=find(build[k]);
+      const im=document.createElement("img");
+      im.src=img(it.id);
+      c.appendChild(im);
+      const lb=document.createElement("div");
+      lb.className="itemLabel";
+      lb.textContent=it.name_es;
+      c.appendChild(lb);
+    }else{
+      const ph=document.createElement("div");
+      ph.className="ph";
+      ph.textContent="+";
+      c.appendChild(ph);
+    }
+
+    c.onclick=()=>openModal(k);
+    mainGrid.appendChild(c);
+  });
+}
+
+/* ========= SWAPS ========= */
+function renderSwaps(){
+  swapBlocks.innerHTML="";
+  swaps.forEach((b,bi)=>{
+    const box=document.createElement("div");
+    box.className="swapBlock";
+
+    const top=document.createElement("div");
+    top.className="swapTop";
+
+    const inp=document.createElement("input");
+    inp.placeholder="Título (opcional)";
+    inp.value=b.title;
+    inp.oninput=()=>b.title=inp.value;
+
+    const del=document.createElement("button");
+    del.className="btn";
+    del.textContent="Eliminar";
+    del.onclick=()=>{ swaps.splice(bi,1); renderSwaps(); };
+
+    top.append(inp,del);
+
+    const grid=document.createElement("div");
+    grid.className="swapGrid";
+
+    b.items.forEach((it,ii)=>{
+      const c=document.createElement("div");
+      c.className="cell";
+      if(it){
+        const im=document.createElement("img");
+        im.src=img(it);
+        c.appendChild(im);
+      }else{
+        const ph=document.createElement("div");
+        ph.className="ph";
+        ph.textContent="+";
+        c.appendChild(ph);
+      }
+      c.onclick=()=>openModal("swap",bi,ii);
+      grid.appendChild(c);
+    });
+
+    box.append(top,grid);
+    swapBlocks.appendChild(box);
+  });
+}
+
+document.getElementById("btnAddSwap").onclick=()=>{
+  swaps.push({ title:"", items:[null,null,null,null,null,null] });
+  renderSwaps();
+};
+
+/* ========= MODAL ========= */
+function openModal(slot,bi,ii){
+  context={ slot, bi, ii };
+  searchInput.value="";
+  updateResults();
+  modal.classList.add("open");
+  searchInput.focus();
+}
+document.getElementById("btnCancel").onclick=()=>modal.classList.remove("open");
+
+searchInput.oninput=updateResults;
+
+function updateResults(){
+  results.innerHTML="";
+  ITEM_INDEX.filter(it=>{
+    if(context.slot==="swap") return true;
+    if(context.slot==="main") return it.slot==="mainhand";
+    return it.slot===context.slot;
+  }).filter(it=>{
+    const q=norm(searchInput.value);
+    return !q || norm(it.name_es).includes(q) || norm(it.name_en).includes(q);
+  }).forEach(it=>{
+    const r=document.createElement("div");
+    r.className="result";
+    r.innerHTML=`<img src="${img(it.id)}"><div class="rMain"><div class="nm">${it.name_es}</div><div class="sub">${it.name_en}</div></div>`;
+    r.onclick=()=>{
+      if(context.slot==="swap"){
+        swaps[context.bi].items[context.ii]=it.id;
+      }else{
+        build[context.slot]=it.id;
+        if(context.slot==="main" && it.hands===2) build.off=null;
+      }
+      modal.classList.remove("open");
+      renderMain(); renderSwaps();
+    };
+    results.appendChild(r);
+  });
+}
+
+/* ========= SCREENSHOT ========= */
+document.getElementById("btnShot").onclick=async()=>{
+  const canvas=await html2canvas(document.getElementById("buildCanvas"),{scale:2});
+  const a=document.createElement("a");
+  a.href=canvas.toDataURL("image/png");
+  a.download="albion-build.png";
+  a.click();
+};
+
+renderMain(); renderSwaps();
+</script>
+</body>
+</html>
